@@ -8,7 +8,7 @@
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, #0f172a, #4f46e5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -19,19 +19,12 @@ body {
   background: white;
   padding: 25px;
   border-radius: 16px;
-  width: 340px;
-  box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+  width: 360px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
   text-align: center;
 }
-h1 {
-  margin: 0;
-  color: #4f46e5;
-}
-.tagline {
-  font-size: 14px;
-  color: #555;
-  margin-bottom: 15px;
-}
+h1 { margin: 0; color: #4f46e5; }
+.tagline { font-size: 14px; color: #555; margin-bottom: 15px; }
 textarea {
   width: 100%;
   height: 90px;
@@ -51,9 +44,7 @@ button {
   font-size: 16px;
   cursor: pointer;
 }
-button:hover {
-  background: #4338ca;
-}
+button:hover { background: #4338ca; }
 pre {
   text-align: left;
   background: #f9fafb;
@@ -63,54 +54,92 @@ pre {
   white-space: pre-wrap;
   font-size: 13px;
 }
-.footer {
-  font-size: 11px;
-  color: #777;
-  margin-top: 10px;
-}
 </style>
 </head>
 
 <body>
-
 <div class="card">
   <h1>What2Type</h1>
-  <p class="tagline">Tell us your goal. We tell you what to type.</p>
+  <p class="tagline">Smart AI prompts for your exact goal</p>
 
-  <textarea id="goal" placeholder="Example: I want a 7-day study plan for physics."></textarea>
-
-  <button onclick="generatePrompt()">Generate Prompt</button>
-
+  <textarea id="goal" placeholder="Example: I want a 30-day JEE study plan"></textarea>
+  <button onclick="generatePrompt()">Generate Smart Prompt</button>
   <pre id="output"></pre>
-
-  <div class="footer">Built with ❤️ by You</div>
 </div>
 
 <script>
 function generatePrompt() {
-  const goal = document.getElementById("goal").value.trim();
+  const goal = document.getElementById("goal").value.toLowerCase().trim();
   if (!goal) {
     alert("Please enter your goal.");
     return;
   }
 
-  const prompt = 
-`You are an expert AI assistant.
+  let prompt = "";
 
-The user's final goal is:
+  if (goal.includes("study") || goal.includes("plan") || goal.includes("exam")) {
+    prompt = `You are an expert academic mentor.
+
+The student's goal:
 "${goal}"
 
-Your task:
-1. Ask any clarifying questions if required.
-2. Then create a clear step-by-step plan.
-3. Mention tools or methods needed.
-4. Provide a final output template the user can reuse.
+Tasks:
+1. Ask for class, subjects, and time available.
+2. Create a realistic daily study plan.
+3. Suggest smart revision strategies.
+4. End with motivation tips.`;
+  }
+  else if (goal.includes("business") || goal.includes("startup") || goal.includes("money")) {
+    prompt = `You are a startup strategist.
 
-Be concise but powerful.`;
+User goal:
+"${goal}"
+
+Tasks:
+1. Ask about budget and skills.
+2. Suggest a step-by-step business model.
+3. Marketing strategy.
+4. Revenue plan.`;
+  }
+  else if (goal.includes("video") || goal.includes("youtube") || goal.includes("content")) {
+    prompt = `You are a content growth expert.
+
+User goal:
+"${goal}"
+
+Tasks:
+1. Define audience.
+2. Suggest content ideas.
+3. Posting schedule.
+4. Growth hacks.`;
+  }
+  else if (goal.includes("code") || goal.includes("app") || goal.includes("website")) {
+    prompt = `You are a senior software engineer.
+
+User goal:
+"${goal}"
+
+Tasks:
+1. Ask about platform and skills.
+2. Suggest tech stack.
+3. Step-by-step build plan.
+4. Common mistakes.`;
+  }
+  else {
+    prompt = `You are an expert problem solver.
+
+User goal:
+"${goal}"
+
+Tasks:
+1. Ask clarifying questions.
+2. Break into steps.
+3. Suggest tools.
+4. Give final actionable plan.`;
+  }
 
   document.getElementById("output").textContent = prompt;
 }
 </script>
-
 </body>
 </html>
