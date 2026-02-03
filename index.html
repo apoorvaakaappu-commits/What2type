@@ -1,43 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>What2Type</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
       background: #0f0f0f;
       color: #ffffff;
+      font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
-    .container {
-      max-width: 600px;
+    .box {
       width: 90%;
+      max-width: 600px;
     }
     h1 {
       text-align: center;
-      margin-bottom: 10px;
     }
     p {
       text-align: center;
       color: #aaa;
-      margin-bottom: 30px;
     }
     textarea, select, button {
       width: 100%;
       padding: 12px;
-      margin-bottom: 15px;
+      margin-top: 12px;
       border-radius: 8px;
       border: none;
       font-size: 16px;
-    }
-    textarea {
-      resize: vertical;
     }
     button {
       background: #4f46e5;
@@ -48,6 +43,7 @@
       background: #4338ca;
     }
     .output {
+      margin-top: 15px;
       background: #1c1c1c;
       padding: 15px;
       border-radius: 8px;
@@ -57,46 +53,86 @@
 </head>
 <body>
 
-  <div class="container">
-    <h1>What2Type</h1>
-    <p>Never guess a prompt again.</p>
+<div class="box">
+  <h1>What2Type</h1>
+  <p>Never guess a prompt again</p>
 
-    <textarea id="goal" rows="4" placeholder="What do you want to achieve with AI?"></textarea>
+  <textarea id="goal" rows="4" placeholder="What do you want AI to do?"></textarea>
 
-    <select id="platform">
-      <option>ChatGPT</option>
-      <option>Claude</option>
-      <option>Gemini</option>
-    </select>
+  <select id="platform">
+    <option>ChatGPT</option>
+    <option>Claude</option>
+    <option>Gemini</option>
+  </select>
 
-    <select id="style">
-      <option>Professional</option>
-      <option>Creative</option>
-      <option>Technical</option>
-      <option>Academic</option>
-    </select>
+  <select id="style">
+    <option>Professional</option>
+    <option>Creative</option>
+    <option>Technical</option>
+    <option>Academic</option>
+  </select>
 
-    <button onclick="generatePrompt()">Generate Prompt</button>
+  <button onclick="generate()">Generate Prompt</button>
 
-    <div class="output" id="result">Your generated prompt will appear here.</div>
+  <div class="output" id="result">
+    Your AI-ready prompt will appear here.
   </div>
+</div>
 
 <script>
-async function generatePrompt() {
+const openings = [
+  "Act as a domain expert.",
+  "You are a senior professional in this field.",
+  "Assume the role of a specialist.",
+  "Think like an industry expert."
+];
+
+const instructions = [
+  "Be detailed and structured.",
+  "Avoid generic explanations.",
+  "Use clear reasoning and examples.",
+  "Focus on accuracy and depth."
+];
+
+const endings = [
+  "Deliver the response in a clear, actionable format.",
+  "Structure the output for practical use.",
+  "Ensure the answer is concise but thorough.",
+  "Optimize for real-world application."
+];
+
+function random(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function generate() {
   const goal = document.getElementById("goal").value;
   const platform = document.getElementById("platform").value;
   const style = document.getElementById("style").value;
 
-  document.getElementById("result").innerText = "Generating...";
+  if (!goal.trim()) {
+    document.getElementById("result").innerText = "Please enter your goal.";
+    return;
+  }
 
-  const response = await fetch("/api/generate", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ goal, platform, style })
-  });
+  const prompt = `
+${random(openings)}
 
-  const data = await response.json();
-  document.getElementById("result").innerText = data.prompt;
+Target AI: ${platform}
+Tone: ${style}
+
+Task:
+${goal}
+
+Guidelines:
+- ${random(instructions)}
+- ${random(instructions)}
+- ${random(endings)}
+
+Respond only with the final output.
+  `.trim();
+
+  document.getElementById("result").innerText = prompt;
 }
 </script>
 
