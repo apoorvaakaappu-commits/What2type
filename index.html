@@ -4,141 +4,66 @@
 <meta charset="UTF-8">
 <title>What2Type</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0f172a, #4f46e5);
+  background: linear-gradient(135deg, #0f172a, #6366f1);
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  margin: 0;
 }
 .card {
   background: white;
   padding: 25px;
   border-radius: 16px;
-  width: 360px;
+  width: 380px;
   box-shadow: 0 20px 40px rgba(0,0,0,0.3);
   text-align: center;
 }
-h1 { margin: 0; color: #4f46e5; }
-.tagline { font-size: 14px; color: #555; margin-bottom: 15px; }
-textarea {
-  width: 100%;
-  height: 90px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  padding: 8px;
-  resize: none;
-}
-button {
-  width: 100%;
-  margin-top: 12px;
-  padding: 10px;
-  background: #4f46e5;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-}
-button:hover { background: #4338ca; }
-pre {
-  text-align: left;
-  background: #f9fafb;
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: 12px;
-  white-space: pre-wrap;
-  font-size: 13px;
-}
+textarea { width:100%; height:90px; }
+button { width:100%; margin-top:10px; padding:10px; background:#4f46e5; color:white; border:none; border-radius:8px; }
+pre { text-align:left; background:#f3f4f6; padding:10px; margin-top:10px; white-space:pre-wrap; }
 </style>
 </head>
 
 <body>
 <div class="card">
   <h1>What2Type</h1>
-  <p class="tagline">Smart AI prompts for your exact goal</p>
+  <p>Enter your goal. We generate the perfect AI prompt.</p>
 
-  <textarea id="goal" placeholder="Example: I want a 30-day JEE study plan"></textarea>
+  <textarea id="goal" placeholder="I want to crack JEE in 6 months"></textarea>
   <button onclick="generatePrompt()">Generate Smart Prompt</button>
-  <pre id="output"></pre>
+  <pre id="output">Waiting...</pre>
 </div>
 
 <script>
-function generatePrompt() {
-  const goal = document.getElementById("goal").value.toLowerCase().trim();
-  if (!goal) {
-    alert("Please enter your goal.");
-    return;
-  }
+const API_KEY = "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";
 
-  let prompt = "";
+async function generatePrompt() {
+  const goal = document.getElementById("goal").value.trim();
+  if (!goal) return alert("Enter your goal");
 
-  if (goal.includes("study") || goal.includes("plan") || goal.includes("exam")) {
-    prompt = `You are an expert academic mentor.
+  document.getElementById("output").textContent = "Thinking...";
 
-The student's goal:
-"${goal}"
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + API_KEY
+    },
+    body: JSON.stringify({
+      model: "llama3-8b-8192",
+      messages: [
+        { role: "system", content: "You create powerful custom AI prompts from user goals." },
+        { role: "user", content: "Create the best possible AI prompt for this goal: " + goal }
+      ]
+    })
+  });
 
-Tasks:
-1. Ask for class, subjects, and time available.
-2. Create a realistic daily study plan.
-3. Suggest smart revision strategies.
-4. End with motivation tips.`;
-  }
-  else if (goal.includes("business") || goal.includes("startup") || goal.includes("money")) {
-    prompt = `You are a startup strategist.
-
-User goal:
-"${goal}"
-
-Tasks:
-1. Ask about budget and skills.
-2. Suggest a step-by-step business model.
-3. Marketing strategy.
-4. Revenue plan.`;
-  }
-  else if (goal.includes("video") || goal.includes("youtube") || goal.includes("content")) {
-    prompt = `You are a content growth expert.
-
-User goal:
-"${goal}"
-
-Tasks:
-1. Define audience.
-2. Suggest content ideas.
-3. Posting schedule.
-4. Growth hacks.`;
-  }
-  else if (goal.includes("code") || goal.includes("app") || goal.includes("website")) {
-    prompt = `You are a senior software engineer.
-
-User goal:
-"${goal}"
-
-Tasks:
-1. Ask about platform and skills.
-2. Suggest tech stack.
-3. Step-by-step build plan.
-4. Common mistakes.`;
-  }
-  else {
-    prompt = `You are an expert problem solver.
-
-User goal:
-"${goal}"
-
-Tasks:
-1. Ask clarifying questions.
-2. Break into steps.
-3. Suggest tools.
-4. Give final actionable plan.`;
-  }
-
-  document.getElementById("output").textContent = prompt;
+  const data = await res.json();
+  document.getElementById("output").textContent =
+    data.choices[0].message.content;
 }
 </script>
 </body>
