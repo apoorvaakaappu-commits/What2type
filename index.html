@@ -1,70 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>What2Type</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0f172a, #6366f1);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-.card {
-  background: white;
-  padding: 25px;
-  border-radius: 16px;
-  width: 380px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-  text-align: center;
-}
-textarea { width:100%; height:90px; }
-button { width:100%; margin-top:10px; padding:10px; background:#4f46e5; color:white; border:none; border-radius:8px; }
-pre { text-align:left; background:#f3f4f6; padding:10px; margin-top:10px; white-space:pre-wrap; }
-</style>
+  <meta charset="UTF-8" />
+  <title>What2Type</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f0f0f;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      max-width: 600px;
+      width: 90%;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    p {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 30px;
+    }
+    textarea, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+    textarea {
+      resize: vertical;
+    }
+    button {
+      background: #4f46e5;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #4338ca;
+    }
+    .output {
+      background: #1c1c1c;
+      padding: 15px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
-
 <body>
-<div class="card">
-  <h1>What2Type</h1>
-  <p>Enter your goal. We generate the perfect AI prompt.</p>
 
-  <textarea id="goal" placeholder="I want to crack JEE in 6 months"></textarea>
-  <button onclick="generatePrompt()">Generate Smart Prompt</button>
-  <pre id="output">Waiting...</pre>
-</div>
+  <div class="container">
+    <h1>What2Type</h1>
+    <p>Never guess a prompt again.</p>
+
+    <textarea id="goal" rows="4" placeholder="What do you want to achieve with AI?"></textarea>
+
+    <select id="platform">
+      <option>ChatGPT</option>
+      <option>Claude</option>
+      <option>Gemini</option>
+    </select>
+
+    <select id="style">
+      <option>Professional</option>
+      <option>Creative</option>
+      <option>Technical</option>
+      <option>Academic</option>
+    </select>
+
+    <button onclick="generatePrompt()">Generate Prompt</button>
+
+    <div class="output" id="result">Your generated prompt will appear here.</div>
+  </div>
 
 <script>
-const API_KEY = "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";
-
 async function generatePrompt() {
-  const goal = document.getElementById("goal").value.trim();
-  if (!goal) return alert("Enter your goal");
+  const goal = document.getElementById("goal").value;
+  const platform = document.getElementById("platform").value;
+  const style = document.getElementById("style").value;
 
-  document.getElementById("output").textContent = "Thinking...";
+  document.getElementById("result").innerText = "Generating...";
 
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+  const response = await fetch("/api/generate", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + API_KEY
-    },
-    body: JSON.stringify({
-      model: "llama3-8b-8192",
-      messages: [
-        { role: "system", content: "You create powerful custom AI prompts from user goals." },
-        { role: "user", content: "Create the best possible AI prompt for this goal: " + goal }
-      ]
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ goal, platform, style })
   });
 
-  const data = await res.json();
-  document.getElementById("output").textContent =
-    data.choices[0].message.content;
+  const data = await response.json();
+  document.getElementById("result").innerText = data.prompt;
 }
 </script>
+
 </body>
 </html>
+
