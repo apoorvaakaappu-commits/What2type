@@ -1,141 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>What2Type</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      background: #0f0f0f;
-      color: #ffffff;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .box {
-      width: 90%;
-      max-width: 600px;
-    }
-    h1 {
-      text-align: center;
-    }
-    p {
-      text-align: center;
-      color: #aaa;
-    }
-    textarea, select, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 12px;
-      border-radius: 8px;
-      border: none;
-      font-size: 16px;
-    }
-    button {
-      background: #4f46e5;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #4338ca;
-    }
-    .output {
-      margin-top: 15px;
-      background: #1c1c1c;
-      padding: 15px;
-      border-radius: 8px;
-      white-space: pre-wrap;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>What2Type AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body { font-family: Arial; background:#0f0f0f;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;}
+.container{width:90%;max-width:650px;}
+h1{text-align:center} p{text-align:center;color:#aaa;}
+textarea,select,button{width:100%;padding:12px;margin-top:12px;border-radius:8px;border:none;font-size:16px;}
+button{background:#4f46e5;color:white;cursor:pointer;font-weight:bold;}
+button:hover{background:#4338ca;}
+.output{margin-top:15px;background:#1c1c1c;padding:15px;border-radius:8px;white-space:pre-wrap;}
+</style>
 </head>
 <body>
-
-<div class="box">
-  <h1>What2Type</h1>
-  <p>Never guess a prompt again</p>
-
-  <textarea id="goal" rows="4" placeholder="What do you want AI to do?"></textarea>
-
-  <select id="platform">
-    <option>ChatGPT</option>
-    <option>Claude</option>
-    <option>Gemini</option>
-  </select>
-
-  <select id="style">
-    <option>Professional</option>
-    <option>Creative</option>
-    <option>Technical</option>
-    <option>Academic</option>
-  </select>
-
-  <button onclick="generate()">Generate Prompt</button>
-
-  <div class="output" id="result">
-    Your AI-ready prompt will appear here.
-  </div>
+<div class="container">
+<h1>What2Type AI</h1>
+<p>Get AI answers and improved prompts instantly</p>
+<textarea id="goal" rows="4" placeholder="Describe what you want AI to do..."></textarea>
+<select id="platform">
+<option>ChatGPT</option>
+<option>Claude</option>
+<option>Gemini</option>
+</select>
+<select id="style">
+<option>Professional</option>
+<option>Creative</option>
+<option>Technical</option>
+<option>Academic</option>
+</select>
+<button onclick="generate()">Generate AI Answer</button>
+<div class="output" id="result">Your AI answer will appear here</div>
 </div>
 
 <script>
-const openings = [
-  "Act as a domain expert.",
-  "You are a senior professional in this field.",
-  "Assume the role of a specialist.",
-  "Think like an industry expert."
-];
-
-const instructions = [
-  "Be detailed and structured.",
-  "Avoid generic explanations.",
-  "Use clear reasoning and examples.",
-  "Focus on accuracy and depth."
-];
-
-const endings = [
-  "Deliver the response in a clear, actionable format.",
-  "Structure the output for practical use.",
-  "Ensure the answer is concise but thorough.",
-  "Optimize for real-world application."
-];
-
-function random(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function generate() {
-  const goal = document.getElementById("goal").value;
+async function generate(){
+  const goal = document.getElementById("goal").value.trim();
   const platform = document.getElementById("platform").value;
   const style = document.getElementById("style").value;
+  const result = document.getElementById("result");
+  if(!goal){ result.innerText="Please enter your goal"; return; }
 
-  if (!goal.trim()) {
-    document.getElementById("result").innerText = "Please enter your goal.";
-    return;
+  result.innerText="Generating AI response...";
+
+  try {
+    const response = await fetch("/api/generate",{
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({goal,platform,style})
+    });
+
+    const data = await response.json();
+    result.innerText = `AI Answer:\n${data.answer}\n\nSuggested Prompt for AI reuse:\n${data.prompt}`;
+  } catch(err){
+    result.innerText="Error generating AI answer: "+err;
   }
-
-  const prompt = `
-${random(openings)}
-
-Target AI: ${platform}
-Tone: ${style}
-
-Task:
-${goal}
-
-Guidelines:
-- ${random(instructions)}
-- ${random(instructions)}
-- ${random(endings)}
-
-Respond only with the final output.
-  `.trim();
-
-  document.getElementById("result").innerText = prompt;
 }
 </script>
-
 </body>
 </html>
 
